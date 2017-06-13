@@ -34,13 +34,14 @@ def print_help():
     print
     print 'Arg list'
     print
-    print '-h           : show help'
+    print '-h           : show help.'
     print '-b           : Bold headings.'
     print '-t           : Indent body text.'
     print '-s  size     : Specify the size of the output file.'
     print '-o  outfile  : Specify name of the output file.'
     print '-m  margin   : Specify the size of the margins.'
     print '-c  w h      : Specify the card height (h) and width (w).'
+    print '-r size     : Specify size of rounded corners, 0 is none.'
 
 
 def parse_args(args):
@@ -51,6 +52,7 @@ def parse_args(args):
     style = {'bold':False, 'tab':False, 'newline':False}
     margin = 3.5
     card_size = (64, 88)
+    corners = 4
 
     a = 1
     while a < len(args):
@@ -75,13 +77,16 @@ def parse_args(args):
             a += 1
             h = float(args[a])
             card_size = (w, h)
+        elif args[a] == '-r':
+            a += 1
+            corners = float(args[a])
         else:
             in_files.append(args[a])
         a += 1
     if len(in_files) == 0 or help_:
         print_help()
         sys.exit()
-    return (in_files, out_file, size_, style, margin, card_size)
+    return (in_files, out_file, size_, style, margin, card_size, corners)
 
 
 def read_csvs(in_files):
@@ -158,7 +163,7 @@ def write_text(svg, pos, margin, y_c, text, card_size, style):
     return y_c
 
 
-def create_cards(cards, out_file, paper_size, margin, card_size, style):
+def create_cards(cards, out_file, paper_size, margin, card_size, style, corners):
     svg = sw.Drawing(filename=out_file, size=mm(paper_size), debug=True)
     x_c = 0
     y_c = 0
@@ -169,7 +174,10 @@ def create_cards(cards, out_file, paper_size, margin, card_size, style):
             x_c = 0
             y_c += 1
             pos = (margin[0] + x_c * size_[0], margin[1] + y_c * size_[1])
-        r = sw.shapes.Rect(mm(pos), mm(card_size), 4, 4, fill='white', stroke='black', stroke_width=2)
+        if corners > 0:
+            r = sw.shapes.Rect(mm(pos), mm(card_size), corners, corners, fill='white', stroke='black', stroke_width=2)
+        else:
+            r = sw.shapes.Rect(mm(pos), mm(card_size), fill='white', stroke='black', stroke_width=2)
         svg.add(r)
         t_y_c = 1
         for w in c:
@@ -188,9 +196,10 @@ if __name__ == '__main__':
     style = args[3]
     margin = (args[4], args[4])
     card_size = args[5]
+    corners = args[6]
     if args[1] == '':
         out_file = 'out_cards.svg'
     else:
         out_file = args[1]
     cards = read_csvs(in_files)
-    create_cards(cards, out_file, size_, margin, card_size, style)
+    create_cards(cards, out_file, size_, margin, card_size, style, corners)
