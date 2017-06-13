@@ -35,10 +35,12 @@ def print_help():
     print 'Arg list'
     print
     print '-h           : show help'
-    print '-s  size     : Specify the size of the output file'
-    print '-o  outfile  : specify name of the output file.'
     print '-b           : Bold headings.'
     print '-t           : Indent body text.'
+    print '-s  size     : Specify the size of the output file.'
+    print '-o  outfile  : Specify name of the output file.'
+    print '-m  margin   : Specify the size of the margins.'
+    print '-c  w h      : Specify the card height (h) and width (w).'
 
 
 def parse_args(args):
@@ -48,6 +50,7 @@ def parse_args(args):
     size_ = 'a4'
     style = {'bold':False, 'tab':False, 'newline':False}
     margin = 3.5
+    card_size = (64, 88)
 
     a = 1
     while a < len(args):
@@ -66,13 +69,19 @@ def parse_args(args):
         elif args[a] == '-m':
             a += 1
             margin = float(args[a])
+        elif args[a] == '-c':
+            a += 1
+            w = float(args[a])
+            a += 1
+            h = float(args[a])
+            card_size = (w, h)
         else:
             in_files.append(args[a])
         a += 1
     if len(in_files) == 0 or help_:
         print_help()
         sys.exit()
-    return (in_files, out_file, size_, style, margin)
+    return (in_files, out_file, size_, style, margin, card_size)
 
 
 def read_csvs(in_files):
@@ -178,9 +187,10 @@ if __name__ == '__main__':
     size_ = sizes[args[2]]
     style = args[3]
     margin = (args[4], args[4])
+    card_size = args[5]
     if args[1] == '':
         out_file = 'out_cards.svg'
     else:
         out_file = args[1]
     cards = read_csvs(in_files)
-    create_cards(cards, out_file, size_, margin, (64,88), style)
+    create_cards(cards, out_file, size_, margin, card_size, style)
