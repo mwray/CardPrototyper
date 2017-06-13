@@ -2,6 +2,18 @@
 Weapon,Bow
 Action,Target can only move one hex next turn.
 ,
+[Title],Quick Shot
+Weapon,Bow
+Action,Fire twice with this weapon
+,
+[Title],Shield Bash
+Weapon,Shield
+Action,Attacker suffers -2 accuracy during their next turn.
+,
+[Title],Wall
+Weapon,Shield
+Action/Reaction,Until you suffer damage gain +2 Toughness to all nodes.
+,
 [Title],Roll
 Weapon,Basic
 Action/Reaction,Move 3 hexes in any direction.
@@ -9,3 +21,27 @@ Action/Reaction,Move 3 hexes in any direction.
 [Title],Shove
 Weapon,Basic
 Action/Reaction,Target within 0/Attacker suffers -2 Accuracy for their next attack.
+,
+[Title],Counter
+Weapon,Basic
+Reaction,Attack once for half damage (rounding up).
+,
+[Title],Parry
+Weapon,Basic
+Reaction,Take no damage from the attack.
+,
+[Title],Backstab
+Weapon,Dagger
+Action/Reaction,Move 2 hexes in any direction and make an attack.
+,
+[Title],Quick Cut
+Weapon,Dagger
+Reaction,Deal 2 damage to a random location to your attacker ignoring armour.
+,
+[Title],Parry
+Weapon,Basic
+Reaction,Take no damage from the attack.
+,
+[Title],Disarm
+Weapon,Sword
+Action,Target within range 0 cannot make a reaction this turn.

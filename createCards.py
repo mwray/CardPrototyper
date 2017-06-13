@@ -89,6 +89,13 @@ def parse_args(args):
     return (in_files, out_file, size_, style, margin, card_size, corners)
 
 
+def get_file_name(f_name, num):
+    words = f_name.split('.')
+    pre = '.'.join(words[0:-1])
+    post = words[-1]
+    return pre + str(num) + '.' + post
+
+
 def read_csvs(in_files):
     cards = [[]]
     for file_ in in_files:
@@ -165,25 +172,34 @@ def write_text(svg, pos, margin, y_c, text, card_size, style):
 
 def create_cards(cards, out_file, paper_size, margin, card_size, style, corners):
     svg = sw.Drawing(filename=out_file, size=mm(paper_size), debug=True)
+    svgs = [svg]
     x_c = 0
     y_c = 0
     size_ = (margin[0] + card_size[0], margin[1] + card_size[1])
+    curr_page = 0
     for c in cards:
         pos = (margin[0] + x_c * size_[0], margin[1] + y_c * size_[1])
-        if pos[0] + card_size[0] + 2 * margin[0] > paper_size[0] or pos[1] > paper_size[1]:
+        if pos[0] + card_size[0] + 2 * margin[0] > paper_size[0]:
             x_c = 0
             y_c += 1
             pos = (margin[0] + x_c * size_[0], margin[1] + y_c * size_[1])
+        if pos[1] + card_size[1] + 2 * margin[1] > paper_size[1]:
+            x_c = 0
+            y_c = 0
+            pos = (margin[0] + x_c * size_[0], margin[1] + y_c * size_[1])
+            curr_page += 1
+            svgs.append(sw.Drawing(filename=get_file_name(out_file,curr_page), size=mm(paper_size), debug=True))
         if corners > 0:
             r = sw.shapes.Rect(mm(pos), mm(card_size), corners, corners, fill='white', stroke='black', stroke_width=2)
         else:
             r = sw.shapes.Rect(mm(pos), mm(card_size), fill='white', stroke='black', stroke_width=2)
-        svg.add(r)
+        svgs[curr_page].add(r)
         t_y_c = 1
         for w in c:
-            t_y_c = write_text(svg, pos, margin, t_y_c, w, card_size, style)
+            t_y_c = write_text(svgs[curr_page], pos, margin, t_y_c, w, card_size, style)
         x_c += 1
-    svg.save()
+    for s in svgs:
+        s.save()
 
 
 if __name__ == '__main__':
