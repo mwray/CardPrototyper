@@ -30,7 +30,8 @@ def parse_args(args):
     in_files = []
     out_file = ''
     size_ = 'a4'
-    style = {'bold':False, 'tab':False}
+    style = {'bold':False, 'tab':False, 'newline':False}
+    margin = 0.35
 
     a = 1
     while a < len(args):
@@ -42,17 +43,20 @@ def parse_args(args):
         elif args[a] == '-s':
             a += 1
             size_ = args[a]
-        elif args[1] == '-b':
+        elif args[a] == '-b':
             style['bold'] = True
-        elif args[1] == '-t':
+        elif args[a] == '-t':
             style['tab'] = True 
+        elif args[a] == '-m':
+            a += 1
+            margin = float(args[a])
         else:
             in_files.append(args[a])
         a += 1
     if len(in_files) == 0 or help_:
         print_help()
         sys.exit()
-    return (in_files, out_file, size_)
+    return (in_files, out_file, size_, style, margin)
 
 
 def read_csvs(in_files):
@@ -70,21 +74,24 @@ def read_csvs(in_files):
 
 
 #type_: 0 is normal, 1 is bolded, 2 is tab
-def write_line(svg, pos, margin, y_c, text, type_):
+def write_line(svg, pos, margin, y_c, text, style, header):
     t_pos = (pos[0] + margin[0], pos[1] + (y_c * margin[1]))
-    if type_ == 2:
+    text_style = ''
+    if style['bold'] and header:
+        text_style += ' font-weight:bold'
+    if style['tab'] and not header:
         t_pos = (t_pos[0] + 0.2, t_pos[1])
-    if type_ == 1:
-        t = sw.text.Text(text, cm(t_pos), style='font-weight:bold')
-    else:
+    if text_style == '':
         t = sw.text.Text(text, cm(t_pos))
+    else:
+        t = sw.text.Text(text, cm(t_pos), style=text_style)
     y_c += 1
     svg.add(t)
     return y_c
 
 
 #type_: 0 is normal, 1 is bolded, 2 is tab
-def convert_text(svg, pos, margin, y_c, text, char_width, card_size, type_):
+def convert_text(svg, pos, margin, y_c, text, char_width, card_size, style, header):
     texts = []
     split_text = text.split(' ')
     i = 0
@@ -104,33 +111,29 @@ def convert_text(svg, pos, margin, y_c, text, char_width, card_size, type_):
         texts.append(curr_text)
 
     for t in texts:
-        y_c = write_line(svg, pos, margin, y_c, t, type_)
+        y_c = write_line(svg, pos, margin, y_c, t, style, header)
     return y_c
 
 
 #type_: 0 is normal, 1 is bolded, 2 is bolded with tab
-def write_text(svg, pos, margin, y_c, text, card_size, type_):
+def write_text(svg, pos, margin, y_c, text, card_size, style):
     char_width = 0.2
 
-    if type_ == 0:
-        if text[0][0] != '[':
-            y_c = convert_text(svg, pos, margin, y_c, text[0] + ':' + text[1], char_width, card_size, 0)
-        else:
-            y_c = convert_text(svg, pos, margin, y_c, text[1], char_width, card_size, 0)
-    else:
+    #if type_ == 0:
+    #    if text[0][0] != '[':
+    #        y_c = convert_text(svg, pos, margin, y_c, text[0] + ':' + text[1], char_width, card_size, style)
+    #    else:
+    #        y_c = convert_text(svg, pos, margin, y_c, text[1], char_width, card_size, style)
+    #else:
+    title = True
+    if text[0][0] != '[':
         title = False
-        if text[0][0] != '[':
-            title = True
-            y_c = convert_text(svg, pos, margin, y_c, text[0], char_width, card_size, 1)
-        if type_ == 1:
-            y_c = convert_text(svg, pos, margin, y_c, text[1], char_width, card_size, 0 if title else 1)
-        else:
-            y_c = convert_text(svg, pos, margin, y_c, text[1], char_width, card_size, 2 if title else 1)
+        y_c = convert_text(svg, pos, margin, y_c, text[0], char_width, card_size, style, True)
+    y_c = convert_text(svg, pos, margin, y_c, text[1], char_width, card_size, style, title or False)
     return y_c
 
 
-def create_cards(cards, out_file, paper_size, card_size, style):
-    margin = (0.5,0.5)
+def create_cards(cards, out_file, paper_size, margin, card_size, style):
     svg = sw.Drawing(filename=out_file, size=cm(paper_size), debug=True)
     x_c = 0
     y_c = 0
@@ -158,9 +161,10 @@ if __name__ == '__main__':
         raise error('Incorrect size inputted')
     size_ = sizes[args[2]]
     style = args[3]
+    margin = (args[4], args[4])
     if args[1] == '':
         out_file = 'out_cards.svg'
     else:
         out_file = args[1]
     cards = read_csvs(in_files)
-    create_cards(cards, out_file, size_, (6.4,8.8), style)
+    create_cards(cards, out_file, size_, margin, (6.4,8.8), style)
