@@ -1,0 +1,11 @@
+﻿[Title],Pinning Shot
+Weapon,Bow
+Action,Target can only move one hex next turn.
+,
+[Title],Roll
+Weapon,Basic
+Action/Reaction,Move 3 hexes in any direction.
+,
+[Title],Shove
+Weapon,Basic
+Action/Reaction,Target within 0/Attacker suffers -2 Accuracy for their next attack.
