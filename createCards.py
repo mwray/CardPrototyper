@@ -3,14 +3,30 @@ import codecs
 import svgwrite as sw
 from pprint import pprint
 
-sizes = { 'a5': (14.8, 21.0), 'a4':(21.0, 29.7), 'a3':(29.7, 42.0)}
+sizes = {
+    'a5':(148, 210),
+    'a4':(210, 297),
+    'a3':(297, 420),
+    'letter':(216, 279),
+    'half-letter':(140, 216),
+    'legal':(216,356),
+    'junior-legal':(127,203),
+    'tabloid':(279,432)
+}
+
+
+def mm(val):
+    if len(val) == 1:
+        return str(val) + 'mm'
+    else:
+        return (str(val[0]) + 'mm', str(val[1]) + 'mm')
 
 
 def cm(val):
     if len(val) == 1:
-        return str(val) + 'cm'
+        return str(val / 10) + 'cm'
     else:
-        return (str(val[0]) + 'cm', str(val[1]) + 'cm')
+        return (str(val[0] / 10) + 'cm', str(val[1] / 10) + 'cm')
 
 
 def print_help():
@@ -31,7 +47,7 @@ def parse_args(args):
     out_file = ''
     size_ = 'a4'
     style = {'bold':False, 'tab':False, 'newline':False}
-    margin = 0.35
+    margin = 3.5
 
     a = 1
     while a < len(args):
@@ -80,11 +96,11 @@ def write_line(svg, pos, margin, y_c, text, style, header):
     if style['bold'] and header:
         text_style += ' font-weight:bold'
     if style['tab'] and not header:
-        t_pos = (t_pos[0] + 0.2, t_pos[1])
+        t_pos = (t_pos[0] + 2, t_pos[1])
     if text_style == '':
-        t = sw.text.Text(text, cm(t_pos))
+        t = sw.text.Text(text, mm(t_pos))
     else:
-        t = sw.text.Text(text, cm(t_pos), style=text_style)
+        t = sw.text.Text(text, mm(t_pos), style=text_style)
     y_c += 1
     svg.add(t)
     return y_c
@@ -117,7 +133,7 @@ def convert_text(svg, pos, margin, y_c, text, char_width, card_size, style, head
 
 #type_: 0 is normal, 1 is bolded, 2 is bolded with tab
 def write_text(svg, pos, margin, y_c, text, card_size, style):
-    char_width = 0.2
+    char_width = 2
 
     #if type_ == 0:
     #    if text[0][0] != '[':
@@ -134,7 +150,7 @@ def write_text(svg, pos, margin, y_c, text, card_size, style):
 
 
 def create_cards(cards, out_file, paper_size, margin, card_size, style):
-    svg = sw.Drawing(filename=out_file, size=cm(paper_size), debug=True)
+    svg = sw.Drawing(filename=out_file, size=mm(paper_size), debug=True)
     x_c = 0
     y_c = 0
     size_ = (margin[0] + card_size[0], margin[1] + card_size[1])
@@ -144,7 +160,7 @@ def create_cards(cards, out_file, paper_size, margin, card_size, style):
             x_c = 0
             y_c += 1
             pos = (margin[0] + x_c * size_[0], margin[1] + y_c * size_[1])
-        r = sw.shapes.Rect(cm(pos), cm(card_size), 4, 4, fill='white', stroke='black', stroke_width=2)
+        r = sw.shapes.Rect(mm(pos), mm(card_size), 4, 4, fill='white', stroke='black', stroke_width=2)
         svg.add(r)
         t_y_c = 1
         for w in c:
@@ -167,4 +183,4 @@ if __name__ == '__main__':
     else:
         out_file = args[1]
     cards = read_csvs(in_files)
-    create_cards(cards, out_file, size_, margin, (6.4,8.8), style)
+    create_cards(cards, out_file, size_, margin, (64,88), style)
