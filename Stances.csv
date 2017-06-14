@@ -1,0 +1,11 @@
+﻿[Title],Cat Stance
+* Requirements,Non-Destroyed Leg.
+* Bonuses,None.
+* Penalties,-1 strength
+* Extra Actions,At the end of your turn you may move 3 hexes.
+,
+[Title],Lightning Stance
+* Requirements,Non-Destroyed Leg.
+* Bonuses,None.
+* Penalties,-1 Damage, -1 Critical.
+* Extra Actions,At the end of your turn you may attack (again).

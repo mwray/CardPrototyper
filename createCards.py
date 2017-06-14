@@ -29,6 +29,20 @@ def cm(val):
         return (str(val[0] / 10) + 'cm', str(val[1] / 10) + 'cm')
 
 
+def split(string, delimiters):
+    new_str = string.split(delimiters[0])
+    for i in range(1,len(delimiters)):
+        temp_list = []
+        for j in new_str:
+            temp_splits = j.split(delimiters[i])
+            for k in range(0,len(temp_splits) - 1):
+                temp_splits[k] += delimiters[i]
+            for k in temp_splits:
+                temp_list.append(k)
+        new_str = temp_list
+    return new_str
+
+
 def print_help():
     print 'USAGE: createCards.py [args] infile[s] [-o outfile]'
     print
@@ -130,7 +144,7 @@ def write_line(svg, pos, margin, y_c, text, style, header):
 #type_: 0 is normal, 1 is bolded, 2 is tab
 def convert_text(svg, pos, margin, y_c, text, char_width, card_size, style, header):
     texts = []
-    split_text = text.split(' ')
+    split_text = split(text, [' ', ':', ',', '.', '-'])
     i = 0
     curr_text = ''
     for i in range(len(split_text)):
@@ -163,6 +177,9 @@ def write_text(svg, pos, margin, y_c, text, card_size, style):
     #        y_c = convert_text(svg, pos, margin, y_c, text[1], char_width, card_size, style)
     #else:
     title = True
+    if text[0][0] == '*' and text[0][1] == ' ':
+        y_c = convert_text(svg, pos, margin, y_c, text[0]+':'+text[1], char_width, card_size, style, False)
+        return y_c
     if text[0][0] != '[':
         title = False
         y_c = convert_text(svg, pos, margin, y_c, text[0], char_width, card_size, style, True)

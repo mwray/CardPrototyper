@@ -45,3 +45,35 @@ Reaction,Take no damage from the attack.
 [Title],Disarm
 Weapon,Sword
 Action,Target within range 0 cannot make a reaction this turn.
+,
+[Title],Reckless Momentum
+Weapon,Greatsword
+Reaction,Take an extra point of damage from the attack. Immediately attack your target.
+,
+[Title],Heavy Stance
+Weapon,Greatsword
+Action,Your next attack deals +2 damage
+,
+[Title],Strong Block
+Weapon,Hammer
+Action/Reaction,Target within 0/Attacker suffers -3 Accuracy for their next attack.
+,
+[Title],Swat
+Weapon,Hammer
+Reaction,The attacker cannot attack again this turn.
+,
+[Title],Armour Crushing
+Weapon,Mace
+Action,Your next attack doesn't deal damage. Instead it destroys the armour of what you hit.
+,
+[Title],Reckless Momentum
+Weapon,Mace
+Reaction,Take an extra point of damage from the attack. Immediately attack your target.
+,
+[Title],Roll
+Weapon,Spear
+Action/Reaction,Move 3 hexes in any direction
+,
+[Title],Charge
+Weapon,Spear
+Action,Your attack deals 1 extra damage for every two hexes you have moved.
