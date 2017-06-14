@@ -227,7 +227,6 @@ def write_text(svg, pos, margin, y_c, text, card_size, style):
     title = True
     #Check if the input is a bullet point
     if text[0][0] == '*' and text[0][1] == ' ':
-        text[0][0] = '·'
         y_c = convert_text(svg, pos, margin, y_c, text[0]+':'+text[1], char_width, card_size, style, False)
         return y_c
     #Check if the header should be written
