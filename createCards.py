@@ -51,18 +51,18 @@ def split(string, delimiters):
 
 def print_help():
     '''prints help for the program'''
-    print 'USAGE: createCards.py [args] infile[s] [-o outfile]'
+    print('USAGE: createCards.py [args] infile[s] [-o outfile]')
     print
-    print 'Arg list'
+    print('Arg list')
     print
-    print '-h           : show help.'
-    print '-b           : Bold headings.'
-    print '-t           : Indent body text.'
-    print '-s  size     : Specify the size of the output file.'
-    print '-o  outfile  : Specify name of the output file.'
-    print '-m  margin   : Specify the size of the margins.'
-    print '-c  w h      : Specify the card height (h) and width (w).'
-    print '-r size     : Specify size of rounded corners, 0 is none.'
+    print('-h           : show help.')
+    print('-b           : Bold headings.')
+    print('-t           : Indent body text.')
+    print('-s  size     : Specify the size of the output file.')
+    print('-o  outfile  : Specify name of the output file.')
+    print('-m  margin   : Specify the size of the margins.')
+    print('-c  w h      : Specify the card height (h) and width (w).')
+    print('-r size     : Specify size of rounded corners, 0 is none.')
 
 
 def parse_args(args):
@@ -195,7 +195,7 @@ def convert_text(svg, pos, margin, y_c, text, char_width, card_size, style, head
             #In this case one word might be too long for the card
             texts.append(str(curr_text))
             curr_text = split_text[i] + ' '
-            print 'WARNING: Text size may be too long for the card(s).'
+            print('WARNING: Text size may be too long for the card(s).')
         else:
             texts.append(str(curr_text))
             curr_text = split_text[i] + ' '
