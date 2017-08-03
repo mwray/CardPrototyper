@@ -3,6 +3,7 @@ import os
 import sys
 import codecs
 import svgwrite as sw
+import numpy as np
 from pprint import pprint
 
 #paper sizes
@@ -132,6 +133,50 @@ def read_csvs(in_files):
                     continue
                 cards[-1].append((words[0],words[1]))
     return cards
+
+
+def draw_hexagon(svg, pos, num, margin, y_c, filled):
+    '''
+    Write a hexagon to the svg with given position
+    Write a group of 7 hexagons to the svg with given position.
+    svg    -- The svgwrite object to write and save to.
+    pos    -- The base position to write the text to.
+    num    -- Which hexagon is begin drawn
+    margin -- The margin on the card
+    y_c    -- The line counter denoting the current position.
+    filled -- Which hexagons are filled (and in what colour)
+    '''
+    ang = (num-1) * np.pi / 3;
+    if num != 0:
+        h_pos = (pos[0] + (10 * np.sin(ang)), pos[1] + (10 * np.cos(ang)))
+    else:
+        h_pos = pos
+    if filled == 0:
+        fill = 'white'
+    elif filled == 1:
+        fill = 'green'
+    elif filled == 2:
+        fill = 'red'
+    elif filled == 3:
+        fill = 'orange'
+    else:
+        fill = 'gray'
+    h = sw.shapes.Circle(mm(h_pos), '5mm', fill=fill, stroke='black', stroke_width=2);
+    svg.add(h)
+
+
+def write_hexagons(svg, pos, margin, y_c, filled):
+    '''
+    Write a group of 7 hexagons to the svg with given position.
+    svg    -- The svgwrite object to write and save to.
+    pos    -- The base position to write the text to.
+    margin -- The margin on the card
+    y_c    -- The line counter denoting the current position.
+    filled -- Which hexagons are filled (and in what colour)
+    '''
+    t_pos = (pos[0] + 10*3, pos[1] + (y_c * margin[1]) + 10*3)
+    for h in range(7):
+        draw_hexagon(svg, t_pos, h, margin, y_c, filled[h])
 
 
 def write_line(svg, pos, margin, y_c, text, style, header):
@@ -282,6 +327,7 @@ def create_cards(cards, out_file, paper_size, margin, card_size, style, corners)
         #write the text on the card
         for w in c:
             t_y_c = write_text(svgs[curr_page], pos, margin, t_y_c, w, card_size, style)
+        write_hexagons(svgs[curr_page], pos, margin, t_y_c, [5,1,0,0,3,1,0])
         x_c += 1
     #save svgs
     for s in svgs:
