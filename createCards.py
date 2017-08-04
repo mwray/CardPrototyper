@@ -19,6 +19,12 @@ sizes = {
 }
 
 
+class Card:
+    def __init__(self):
+        self.hexes = []
+        self.text = []
+
+
 def mm(val):
     '''converts float value into string format with mm'''
     if len(val) == 1:
@@ -122,16 +128,23 @@ def get_file_name(f_name, num):
 
 def read_csvs(in_files):
     '''reads and return csvs in the list inside in_files'''
-    cards = [[]]
+    cards = [Card()]
     for file_ in in_files:
         with codecs.open(file_, 'r', encoding="utf-8-sig") as in_f:
             for line in in_f:
                 clean_line = line.lstrip().rstrip()
                 words = clean_line.split(',')
                 if words[0] == '':
-                    cards.append([])
+                    cards.append(Card())
                     continue
-                cards[-1].append((words[0],words[1]))
+                elif words[0].lower() == '<hex>':
+                    try:
+                        cards[-1].hexes = [int(i) for i in words[1]]
+                    except Exception as e:
+                        print "Can't read hex", e.args
+                    else:
+                        continue
+                cards[-1].text.append((words[0],words[1]))
     return cards
 
 
@@ -146,7 +159,7 @@ def draw_hexagon(svg, pos, num, margin, y_c, filled):
     y_c    -- The line counter denoting the current position.
     filled -- Which hexagons are filled (and in what colour)
     '''
-    ang = (num-1) * np.pi / 3;
+    ang = -1 * (num-4) * np.pi / 3;
     if num != 0:
         h_pos = (pos[0] + (10 * np.sin(ang)), pos[1] + (10 * np.cos(ang)))
     else:
@@ -159,8 +172,10 @@ def draw_hexagon(svg, pos, num, margin, y_c, filled):
         fill = 'red'
     elif filled == 3:
         fill = 'orange'
-    else:
+    elif filled == 4:
         fill = 'gray'
+    else:
+        fill = 'black'
     h = sw.shapes.Circle(mm(h_pos), '5mm', fill=fill, stroke='black', stroke_width=2);
     svg.add(h)
 
@@ -325,9 +340,10 @@ def create_cards(cards, out_file, paper_size, margin, card_size, style, corners)
         svgs[curr_page].add(r)
         t_y_c = 1
         #write the text on the card
-        for w in c:
+        for w in c.text:
             t_y_c = write_text(svgs[curr_page], pos, margin, t_y_c, w, card_size, style)
-        write_hexagons(svgs[curr_page], pos, margin, t_y_c, [5,1,0,0,3,1,0])
+        if c.hexes != []:
+            write_hexagons(svgs[curr_page], pos, margin, t_y_c, c.hexes)
         x_c += 1
     #save svgs
     for s in svgs:
