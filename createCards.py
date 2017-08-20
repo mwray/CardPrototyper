@@ -67,9 +67,10 @@ def print_help():
     print('-t           : Indent body text.')
     print('-s  size     : Specify the size of the output file.')
     print('-o  outfile  : Specify name of the output file.')
-    print('-m  margin   : Specify the size of the margins.')
+    print('-m  margin   : Specify the size of the text margins.')
+    print('-f  w h      : Specify the offset between cards.')
     print('-c  w h      : Specify the card height (h) and width (w).')
-    print('-r size     : Specify size of rounded corners, 0 is none.')
+    print('-r  size     : Specify size of rounded corners, 0 is none.')
 
 
 def parse_args(args):
@@ -81,6 +82,7 @@ def parse_args(args):
     style = {'bold':False, 'tab':False, 'newline':False}
     margin = 3.5
     card_size = (64, 88)
+    card_offset = (1, 1)
     corners = 4
 
     a = 1
@@ -106,6 +108,12 @@ def parse_args(args):
             a += 1
             h = float(args[a])
             card_size = (w, h)
+        elif args[a] == '-f':
+            a += 1
+            w = float(args[a])
+            a += 1
+            h = float(args[a])
+            card_offset = (w, h)
         elif args[a] == '-r':
             a += 1
             corners = float(args[a])
@@ -115,7 +123,7 @@ def parse_args(args):
     if len(in_files) == 0 or help_:
         print_help()
         sys.exit()
-    return (in_files, out_file, size_, style, margin, card_size, corners)
+    return (in_files, out_file, size_, style, margin, card_size, card_offset, corners)
 
 
 def get_file_name(f_name, num):
@@ -297,39 +305,40 @@ def write_text(svg, pos, margin, y_c, text, card_size, style):
     return y_c
 
 
-def create_cards(cards, out_file, paper_size, margin, card_size, style, corners):
+def create_cards(cards, out_file, paper_size, margin, card_size, card_offset, style, corners):
     '''
     Creates cards from the dictionary given a number of paramters
 
     Keyword arguments:
-    cards      -- Dict containing the text for each card.
-    out_file   -- The name of the (first) output file.
-    paper_size -- The size of the paper using (see paper sizes above).
-    margin     -- The size of the margin that is being used.
-    card_size  -- The size of the cards.
-    style      -- The style of the text to print, see the parse_args function.
-    corners    -- The size of the rounded corners (0 is a sharp corner).
+    cards       -- Dict containing the text for each card.
+    out_file    -- The name of the (first) output file.
+    paper_size  -- The size of the paper using (see paper sizes above).
+    margin      -- The size of the margin that is being used.
+    card_size   -- The size of the cards.
+    card_offset -- The size between the cards.
+    style       -- The style of the text to print, see the parse_args function.
+    corners     -- The size of the rounded corners (0 is a sharp corner).
     '''
     svg = sw.Drawing(filename=out_file, size=mm(paper_size), debug=True)
     svgs = [svg]
     x_c = 0
     y_c = 0
     #add margin size to card size
-    size_ = (margin[0] + card_size[0], margin[1] + card_size[1])
+    size_ = (card_offset[0] + card_size[0], card_offset[1] + card_size[1])
     curr_page = 0
     #create grid of cards
     for c in cards:
-        pos = (margin[0] + x_c * size_[0], margin[1] + y_c * size_[1])
+        pos = (card_offset[0] + x_c * size_[0], card_offset[1] + y_c * size_[1])
         #Check if max horizontal, if so move onto next line
-        if pos[0] + card_size[0] + 2 * margin[0] > paper_size[0]:
+        if pos[0] + card_size[0] + 2 * card_offset[0] > paper_size[0]:
             x_c = 0
             y_c += 1
-            pos = (margin[0] + x_c * size_[0], margin[1] + y_c * size_[1])
+            pos = (card_offset[0] + x_c * size_[0], card_offset[1] + y_c * size_[1])
         #check if max vertical, if so move onto next file
-        if pos[1] + card_size[1] + 2 * margin[1] > paper_size[1]:
+        if pos[1] + card_size[1] + 2 * card_offset[1] > paper_size[1]:
             x_c = 0
             y_c = 0
-            pos = (margin[0] + x_c * size_[0], margin[1] + y_c * size_[1])
+            pos = (card_offset[0] + x_c * size_[0], card_offset[1] + y_c * size_[1])
             curr_page += 1
             svgs.append(sw.Drawing(filename=get_file_name(out_file,curr_page), size=mm(paper_size), debug=True))
         #Create basic rectangle for the card with/without corners.
@@ -360,7 +369,8 @@ if __name__ == '__main__':
     style = args[3]
     margin = (args[4], args[4])
     card_size = args[5]
-    corners = args[6]
+    card_offset = args[6]
+    corners = args[7]
     if args[1] == '':
         out_file = 'out_cards.svg'
     else:
@@ -368,4 +378,4 @@ if __name__ == '__main__':
     #read csvs
     cards = read_csvs(in_files)
     #create cards
-    create_cards(cards, out_file, size_, margin, card_size, style, corners)
+    create_cards(cards, out_file, size_, margin, card_size, card_offset, style, corners)
